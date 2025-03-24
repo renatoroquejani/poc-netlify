@@ -1,0 +1,26 @@
+# Arquivos de ambiente
+.env
+
+# Binários compilados
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+netlify-poc
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Arquivos de log
+*.log
+
+# Diretórios de dependências
+vendor/
+
+# Arquivos de IDE e editores
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlify Deploy - KodesTech</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="text-center my-5">
+            <h1>Netlify Deploy</h1>
+            <p class="lead">Deploy de sites estu00e1ticos na Netlify a partir de arquivos no S3</p>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">Formulário de Deploy</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="deployForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nome de Usuário</label>
+                                <input type="text" class="form-control" id="username" name="username" required 
+                                       placeholder="Ex: renato (para renato.sites.kodestech.com.br)">
+                                <div class="form-text">Será usado para criar o subdomínio: <span id="previewSubdomain">usuario.sites.kodestech.com.br</span></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="customDomain" class="form-label">Domínio Personalizado (opcional)</label>
+                                <input type="text" class="form-control" id="customDomain" name="customDomain" 
+                                       placeholder="Ex: meusite.com.br">
+                                <div class="form-text">Se fornecido, será configurado como domínio alternativo.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="s3Path" class="form-label">Caminho no S3</label>
+                                <input type="text" class="form-control" id="s3Path" name="s3Path" required
+                                       placeholder="Ex: sites/usuario">
+                                <div class="form-text">Caminho no bucket S3 onde os arquivos estáticos estão armazenados.</div>
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="deployButton">
+                                    <span class="spinner-border spinner-border-sm d-none" id="deploySpinner" role="status" aria-hidden="true"></span>
+                                    Iniciar Deploy
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4 d-none" id="resultCard">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="card-title mb-0">Resultado do Deploy</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="deployResult"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="card-title mb-0">Instruu00e7u00f5es</h3>
+                    </div>
+                    <div class="card-body">
+                        <h4>Como usar:</h4>
+                        <ol>
+                            <li>Preencha o nome de usuu00e1rio para criar o subdomu00ednio.</li>
+                            <li>Opcionalmente, informe um domu00ednio personalizado.</li>
+                            <li>Informe o caminho no bucket S3 onde os arquivos estu00e1ticos estu00e3o armazenados.</li>
+                            <li>Clique em "Iniciar Deploy" e aguarde a confirmau00e7u00e3o.</li>
+                        </ol>
+
+                        <h4>Configurau00e7u00e3o de DNS para domu00ednio personalizado:</h4>
+                        <p>Se vocu00ea forneceu um domu00ednio personalizado, adicione os seguintes registros DNS:</p>
+                        <ul>
+                            <li><strong>Registro A:</strong> @ -> 104.198.14.52</li>
+                            <li><strong>Registro CNAME:</strong> www -> [seu-site].netlify.app</li>
+                        </ul>
+                        
+                        <div class="alert alert-primary mt-4">
+                            <h5>Novo! Ferramenta de Teste da Netlify</h5>
+                            <p>Vocu00ea tambu00e9m pode usar nossa <a href="/static/netlify-test.html" class="alert-link">ferramenta de teste</a> para experimentar a criau00e7u00e3o de sites na Netlify sem precisar de arquivos no S3.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center mt-5 mb-4">
+            <p>&copy; 2025 KodesTech - Todos os direitos reservados</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>

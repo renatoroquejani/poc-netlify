@@ -1,0 +1,261 @@
+basePath: /
+definitions:
+  api.DomainRequest:
+    properties:
+      domain:
+        example: example.com
+        type: string
+      site_id:
+        example: e17e2166-d8ab-4cad-9916-a9a3fed7750d
+        type: string
+    required:
+    - site_id
+    type: object
+  api.DomainResponse:
+    properties:
+      domain:
+        example: example.com
+        type: string
+      message:
+        example: Domínio adicionado com sucesso
+        type: string
+      site_id:
+        example: e17e2166-d8ab-4cad-9916-a9a3fed7750d
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  api.TestDeployResponse:
+    properties:
+      created_at:
+        example: "2023-10-25T15:30:45Z"
+        type: string
+      message:
+        example: Site de teste criado com sucesso
+        type: string
+      site_id:
+        example: a1b2c3d4
+        type: string
+      site_url:
+        example: https://test-site.netlify.app
+        type: string
+      success:
+        example: true
+        type: boolean
+      test_success:
+        example: true
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API para facilitar o deploy de arquivos estáticos na Netlify a partir
+    de um bucket S3
+  title: Netlify Deploy API
+  version: "1.0"
+paths:
+  /api/deploy/site:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Cria um novo site na Netlify ou atualiza um existente quando o
+        ID é fornecido
+      parameters:
+      - description: ID do site na Netlify para atualização (opcional)
+        in: formData
+        name: site_id
+        type: string
+      - description: Nome do site para teste
+        in: formData
+        name: site_name
+        required: true
+        type: string
+      - description: Descrição do site para teste
+        in: formData
+        name: description
+        type: string
+      - description: Remover o site após o teste
+        in: formData
+        name: cleanup_after
+        type: boolean
+      - description: Domínio personalizado para o site (opcional)
+        in: formData
+        name: custom_domain
+        type: string
+      - description: Arquivo HTML para deploy (opcional)
+        in: formData
+        name: file
+        type: file
+      - description: Caminho da pasta local para deploy (opcional)
+        in: formData
+        name: folder_path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.TestDeployResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.TestDeployResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.TestDeployResponse'
+      summary: Cria ou atualiza sites na Netlify
+      tags:
+      - deploy
+  /api/domains/add:
+    post:
+      consumes:
+      - application/json
+      description: Adiciona um domínio personalizado como alias para um site existente
+        na Netlify
+      parameters:
+      - description: Dados do domínio a ser adicionado
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+      summary: Adiciona um domínio personalizado a um site
+      tags:
+      - domains
+  /api/domains/remove:
+    post:
+      consumes:
+      - application/json
+      description: Remove um domínio personalizado dos aliases de um site existente
+        na Netlify
+      parameters:
+      - description: Dados do domínio a ser removido
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+      summary: Remove um domínio personalizado de um site
+      tags:
+      - domains
+  /api/domains/remove-primary:
+    post:
+      consumes:
+      - application/json
+      description: Remove o domínio principal de um site existente na Netlify, mantendo
+        os aliases
+      parameters:
+      - description: ID do site a ter o domínio principal removido
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+      summary: Remove o domínio principal de um site
+      tags:
+      - domains
+  /api/domains/set-default:
+    post:
+      consumes:
+      - application/json
+      description: Define um domínio personalizado como o domínio principal de um
+        site existente na Netlify
+      parameters:
+      - description: Dados do domínio a ser definido como principal
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.DomainRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.DomainResponse'
+      summary: Define um domínio como o domínio principal
+      tags:
+      - domains
+  /api/test/netlify/connection:
+    get:
+      consumes:
+      - application/json
+      description: Testa a conexão com a API da Netlify e exibe informações sobre
+        o token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Testa a conexão com a API da Netlify
+      tags:
+      - netlify
+schemes:
+- http
+- https
+swagger: "2.0"
