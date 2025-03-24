@@ -1,38 +1,35 @@
-# Netlify Integration PoC
+# Netlify Integration API
 
-Prova de Conceito (PoC) em Golang para integração com a plataforma Netlify, permitindo o deploy de arquivos estáticos armazenados em um bucket S3.
+API em Golang para integração com a plataforma Netlify, permitindo o deploy de arquivos estáticos armazenados em um bucket S3 e o gerenciamento de domínios personalizados.
 
 ## Funcionalidades
 
-1. **Verificação e Criação de Sites na Netlify**
-   - Verifica se um site já existe para um subdomínio específico
-   - Cria um novo site se necessário
-   - Formato do subdomínio: `<usuario>.sites.kodestech.com.br`
+1. **Gerenciamento de Domínios**
+   - Adicionar domínios personalizados a sites Netlify
+   - Remover domínios personalizados
+   - Definir domínio principal
+   - Remover domínio principal
 
-2. **Configuração de DNS**
-   - Configura DNS para o subdomínio padrão
-   - Permite apontar domínios personalizados para o site
+2. **Deploy de Sites**
+   - Deploy de arquivos para a Netlify via upload direto 
+   - Suporte a carregamento de arquivos HTML, CSS e JS
+   - Suporte para especificar pastas locais
 
-3. **Deploy de Arquivos Estáticos**
-   - Conecta-se ao bucket S3 para obter os arquivos
-   - Realiza o deploy dos arquivos na Netlify
-   - Verifica o sucesso do deploy
+3. **Interface de Administração**
+   - Interface web para gerenciamento
+   - Listar sites existentes
+   - Ver logs de operações
 
-4. **Interface Web e API**
-   - Interface web amigável para iniciar deploys
-   - API REST para integração com outros sistemas
-
-5. **Ambiente de Teste da Netlify**
-   - Rota dedicada para testes rápidos da API Netlify
-   - Interface gráfica para criação de sites de teste
-   - Documentação via Swagger
+4. **Documentação API**
+   - Documentação via Swagger UI
+   - Testes de conexão com a Netlify
 
 ## Requisitos
 
 - Go 1.21 ou superior
 - Credenciais da Netlify (token de acesso)
-- Credenciais da AWS (para acesso ao S3)
-- Domínio principal configurado na Netlify: `sites.kodestech.com.br`
+- Credenciais da AWS (para acesso ao S3, quando usar deploy via S3)
+- Domínio configurado na Netlify (opcional)
 
 ## Variáveis de Ambiente
 
@@ -49,6 +46,7 @@ S3_BUCKET_NAME=nome_do_bucket_s3
 # Configurações da API
 API_PORT=8080
 GIN_MODE=debug  # Use 'release' em produção
+BASE_DOMAIN=sites.seudominio.com.br
 ```
 
 ## Como Usar
@@ -57,7 +55,7 @@ GIN_MODE=debug  # Use 'release' em produção
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/kodestech/poc-netlify.git
+git clone https://github.com/renatoroquejani/poc-netlify.git
 cd poc-netlify
 
 # Configurar variáveis de ambiente
@@ -68,7 +66,7 @@ cp .env.example .env
 go run main.go
 ```
 
-Acesse a interface web em `http://localhost:8080`
+Acesse a interface web em `http://localhost:8080` e a documentação do Swagger em `http://localhost:8080/docs/swagger/index.html`
 
 ### API REST
 
@@ -83,63 +81,60 @@ Resposta:
 {
   "status": "online",
   "version": "1.0.0",
-  "time": "2025-03-18T15:45:09-03:00"
+  "time": "2025-03-24T15:45:09-03:00"
 }
 ```
 
-#### Iniciar Deploy
+#### Deploy de Site
 
 ```
-POST /api/deploy
-Content-Type: application/json
+POST /api/deploy/site
+Content-Type: multipart/form-data
 
-{
-  "username": "renato",
-  "custom_domain": "renato.com.br",
-  "s3_path": "sites/renato"
-}
+site_name: meu-site-teste
+description: Site para testes
+custom_domain: meu-site.exemplo.com
+file: [arquivo HTML]
 ```
 
 Resposta:
 ```json
 {
   "success": true,
-  "message": "Deploy iniciado com sucesso",
-  "subdomain": "renato.sites.kodestech.com.br"
-}
-```
-
-#### Testar Criação de Sites
-
-```
-POST /api/test/netlify
-Content-Type: application/json
-
-{
-  "site_name": "teste-site",
-  "description": "Site para fins de teste",
-  "test_content": "<h1>Hello World</h1>",
-  "cleanup_after": true,
-  "use_custom_domain": false
-}
-```
-
-Resposta:
-```json
-{
-  "success": true,
-  "message": "Site de teste criado com sucesso",
+  "message": "Site criado com sucesso",
   "site_id": "12345abcde",
-  "site_url": "https://teste-site.netlify.app",
-  "created_at": "2025-03-19T16:45:09-03:00",
+  "site_url": "https://meu-site-teste.netlify.app",
+  "created_at": "2025-03-24T16:45:09-03:00",
   "test_success": true
+}
+```
+
+#### Adicionar Domínio Personalizado
+
+```
+POST /api/domains/add
+Content-Type: application/json
+
+{
+  "site_id": "12345abcde",
+  "domain": "meu-site.exemplo.com"
+}
+```
+
+Resposta:
+```json
+{
+  "success": true,
+  "message": "Domínio adicionado com sucesso",
+  "site_id": "12345abcde",
+  "domain": "meu-site.exemplo.com"
 }
 ```
 
 ## Estrutura do Projeto
 
 ```
-/cmd            # Ponto de entrada da aplicação (legado)
+/docs           # Documentação Swagger
 /internal       # Código interno da aplicação
   /api          # API web
   /netlify      # Integração com a Netlify
@@ -147,5 +142,9 @@ Resposta:
   /config       # Configurações da aplicação
 /web            # Interface web
   /static       # Arquivos estáticos (HTML, CSS, JS)
-/pkg            # Pacotes reutilizáveis
 main.go         # Ponto de entrada principal
+```
+
+## Documentação
+
+A documentação completa da API está disponível através do Swagger UI em `/docs/swagger/index.html`.
